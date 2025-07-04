@@ -24,7 +24,7 @@ load_dotenv()
 
 # Flask app initialization
 app = Flask(__name__)
-application = app
+
 
 # --- CHANGE 1: More flexible CORS configuration ---
 # Allows requests from your public domain and localhost for testing.
