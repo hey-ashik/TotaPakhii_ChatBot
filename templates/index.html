@@ -59,6 +59,7 @@
             font-size: 16px;
             font-weight: 600;
             color: #e6edf3;
+            font-family: _tiempos_b4db0f, __tiempos_Fallback_b4db0f, ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
         }
         
         .header-right {
@@ -80,6 +81,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            font-family: _tiempos_b4db0f, __tiempos_Fallback_b4db0f, ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
         }
         
         .get-plus-btn:hover {
@@ -122,6 +124,7 @@
         
         .sidebar-content {
             padding: 20px;
+            font-family: _tiempos_b4db0f, __tiempos_Fallback_b4db0f, ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
         }
         
         .sidebar-section {
@@ -185,6 +188,7 @@
             flex-direction: column;
             justify-content: center;
             min-height: 400px;
+             font-family: _tiempos_b4db0f, __tiempos_Fallback_b4db0f, ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
         }
         
         .welcome-title {
@@ -559,6 +563,7 @@
             max-height: 120px;
             outline: none;
             overflow-y: auto;
+            font-family: _tiempos_b4db0f, __tiempos_Fallback_b4db0f, ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
         }
         
         .message-input::placeholder {
@@ -641,6 +646,7 @@
             display: none;
             animation: slideUp 0.2s ease-out;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            font-family: _tiempos_b4db0f, __tiempos_Fallback_b4db0f, ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
         }
         
         .tools-dropdown.active {
@@ -750,6 +756,7 @@
             .welcome-section {
                 padding: 40px 16px 30px;
                 min-height: 300px;
+                font-family: _tiempos_b4db0f, __tiempos_Fallback_b4db0f, ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
             }
             
             .welcome-title {
@@ -771,11 +778,13 @@
             
             .message-input {
                 font-size: 16px; /* Prevent zoom on iOS */
+                font-family: _tiempos_b4db0f, __tiempos_Fallback_b4db0f, ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
             }
             
             .get-plus-btn {
                 padding: 6px 12px;
                 font-size: 13px;
+                 font-family: _tiempos_b4db0f, __tiempos_Fallback_b4db0f, ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
             }
             
             .close-chat-btn {
@@ -867,6 +876,7 @@
     font-size: 14px;
     padding: 10px 0;
     outline: none;
+    font-family: _tiempos_b4db0f, __tiempos_Fallback_b4db0f, ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
 }
 
 #searchInput::placeholder {
@@ -975,6 +985,7 @@
     text-align: center;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
     animation: slideUp 0.3s ease-out;
+    font-family: _tiempos_b4db0f, __tiempos_Fallback_b4db0f, ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
 }
 
 .modal-title {
@@ -1047,9 +1058,11 @@
             <span class="header-title">TotaPakhii</span>
         </div>
         <div class="header-right">
-            <button class="get-plus-btn">
-                ⭐ Ai-Chatbot
-            </button>
+            <a href="https://chat.ashikai.xyz/" target="_blank" style="text-decoration: none;">
+                <button class="get-plus-btn">
+                    ⭐ Full Window
+                </button>
+            </a>
             <button class="settings-btn"></button>
         </div>
     </div>
@@ -1092,6 +1105,10 @@
                 <div class="sidebar-item tool-sidebar-item" onclick="selectToolFromSidebar('web')" data-tool="web">
                     <span>🌐</span>
                     <span>Web Search</span>
+                </div>
+                <div class="sidebar-item tool-sidebar-item" onclick="selectToolFromSidebar('deepsearch')" data-tool="deepsearch">
+                    <span>🧠</span>
+                    <span>Deep Search</span>
                 </div>
             </div>
             
@@ -1147,6 +1164,13 @@
                     <div class="tool-info">
                         <div class="tool-title">Web Search</div>
                         <div class="tool-description">Get real-time information from the internet</div>
+                    </div>
+                </div>
+                <div class="tool-option" onclick="selectTool('deepsearch')" data-tool="deepsearch">
+                    <div class="tool-icon">🧠</div>
+                    <div class="tool-info">
+                        <div class="tool-title">Deep Search</div>
+                        <div class="tool-description">Directly query the LLM for creative or complex tasks</div>
                     </div>
                 </div>
             </div>
@@ -1223,8 +1247,24 @@
             
             // Update button appearance
             const toolsButton = document.getElementById('toolsButton');
-            const icon = tool === 'knowledgebase' ? '📝' : '🌐';
-            const title = tool === 'knowledgebase' ? 'Knowledge Base' : 'Web Search';
+            let icon = '📝';
+            let title = 'Knowledge Base';
+
+            switch (tool) {
+                case 'web':
+                    icon = '🌐';
+                    title = 'Web Search';
+                    break;
+                case 'deepsearch':
+                    icon = '🧠';
+                    title = 'Deep Search';
+                    break;
+                case 'knowledgebase':
+                default:
+                    // Keep default values
+                    break;
+            }
+            
             toolsButton.innerHTML = `<span>${icon}</span><span></span>`;
             
             // Update tool selection in dropdown
@@ -1235,7 +1275,7 @@
                 }
             });
 
-            // NEW: Update tool selection in sidebar
+            // Update tool selection in sidebar
             document.querySelectorAll('.tool-sidebar-item').forEach(item => {
                 item.classList.remove('active');
                 if (item.dataset.tool === tool) {
@@ -1243,7 +1283,6 @@
                 }
             });
         }
-        
         // Chat functions
         function minimizeChat() {
             console.log('Chat minimized');
@@ -1270,94 +1309,95 @@
             }
         }
         
+             
         async function sendMessage() {
-    const input = document.getElementById('messageInput');
-    const message = input.value.trim();
-    
-    if (!message || isProcessing) return;
-    
-    isProcessing = true;
-    startChat();
-    
-    document.getElementById('sendButton').disabled = true;
-    
-    input.value = '';
-    input.style.height = 'auto';
-    
-    addMessage(message, 'user');
-    scrollToBottom();
-    showTypingIndicator();
-    
-    try {
-        // --- CRITICAL FIX: Use a relative URL for the API call ---
-        // This will send the request to https://chat.ashikai.xyz/api/chat
-        // instead of http://127.0.0.1:7860/api/chat
-        const response = await fetch('/api/chat', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                message: message,
-                type: selectedTool === 'knowledgebase' ? 'pdf' : 'web',
-                session_id: sessionId
-            }),
-        });
-        
-        hideTypingIndicator();
-        
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ error: 'Failed to response from server.' }));
-            throw new Error(`Server error: ${response.status} - ${errorData.error || 'Please check the server logs.'}`);
-        }
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            sessionId = data.session_id;
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
             
-            let formattedSources = [];
-            if (data.sources && data.sources.length > 0) {
-                formattedSources = data.sources.map(sourceArr => {
-                    const [title, details] = sourceArr;
-                    let url = null;
-                    let content = details;
+            if (!message || isProcessing) return;
+            
+            isProcessing = true;
+            startChat();
+            
+            document.getElementById('sendButton').disabled = true;
+            
+            input.value = '';
+            input.style.height = 'auto';
+            
+            addMessage(message, 'user');
+            scrollToBottom();
+            showTypingIndicator();
+            
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    // --- THIS IS THE FIX ---
+                    // We now send the selectedTool value directly.
+                    // The backend will receive 'knowledgebase', 'web', or 'deepsearch'.
+                    body: JSON.stringify({
+                        message: message,
+                        type: selectedTool,
+                        session_id: sessionId
+                    }),
+                    // --- END OF FIX ---
+                });
+                
+                hideTypingIndicator();
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ error: 'Failed to response from server.' }));
+                    throw new Error(`Server error: ${response.status} - ${errorData.error || 'Please check the server logs.'}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    sessionId = data.session_id;
                     
-                    const urlMatch = details.match(/🔗 (https?:\/\/[^\s]+)/);
-                    if (urlMatch) {
-                        url = urlMatch[1];
-                        content = details.replace(urlMatch[0], '').replace(/\*\*([^*]+)\*\*/g, '$1').trim();
+                    let formattedSources = [];
+                    if (data.sources && data.sources.length > 0) {
+                        formattedSources = data.sources.map(sourceArr => {
+                            const [title, details] = sourceArr;
+                            let url = null;
+                            let content = details;
+                            
+                            const urlMatch = details.match(/🔗 (https?:\/\/[^\s]+)/);
+                            if (urlMatch) {
+                                url = urlMatch[1];
+                                content = details.replace(urlMatch[0], '').replace(/\*\*([^*]+)\*\*/g, '$1').trim();
+                            }
+                            
+                            return {
+                                title: title.replace(/\*\*([^*]+)\*\*/g, '$1'),
+                                content: content,
+                                url: url
+                            };
+                        });
                     }
                     
-                    return {
-                        title: title.replace(/\*\*([^*]+)\*\*/g, '$1'),
-                        content: content,
-                        url: url
-                    };
-                });
+                    addMessage(data.answer, 'bot', formattedSources);
+                    scrollToBottom();
+                    
+                    saveChatToHistory(message, data.answer);
+                    
+                } else {
+                    addMessage(`Sorry, an API error occurred: ${data.error}`, 'bot');
+                    console.error('API Error:', data.error);
+                }
+                
+            } catch (error) {
+                hideTypingIndicator();
+                addMessage(`Server is OFFLINE !! Kindly contact with ADMIN (Ashikul Islam). Error: ${error.message}`, 'bot');
+                console.error('Fetch Error:', error);
+            } finally {
+                isProcessing = false;
+                document.getElementById('sendButton').disabled = false;
+                document.getElementById('messageInput').focus();
             }
-            
-            addMessage(data.answer, 'bot', formattedSources);
-            scrollToBottom();
-            
-            // ADD THIS LINE: Save chat to history
-            saveChatToHistory(message, data.answer);
-            
-        } else {
-            addMessage(`Sorry, an API error occurred: ${data.error}`, 'bot');
-            console.error('API Error:', data.error);
         }
-        
-    } catch (error) {
-        hideTypingIndicator();
-        addMessage(`Server is OFFLINE !! Kindly contact with ADMIN (Ashikul Islam). Error: ${error.message}`, 'bot');
-        console.error('Fetch Error:', error);
-    } finally {
-        isProcessing = false;
-        document.getElementById('sendButton').disabled = false;
-        document.getElementById('messageInput').focus();
-    }
-}
         
         function addMessage(content, sender, sources = null) {
             const messagesContainer = document.getElementById('messagesContainer');

@@ -1,4 +1,4 @@
-# --- START OF FILE hello19.py ---
+
 
 import os
 from pinecone import Pinecone
@@ -337,6 +337,61 @@ def query_web_search(query):
     # Return the raw answer from the web search
     return answer, sources, "web"
 
+
+def query_deep_search(query, session_id=None):
+    """Query the LLM directly with conversation context."""
+    if not query.strip():
+        return "Please enter a question.", [], "deepsearch"
+
+    if not llm:
+        return ("Service Unavailable: Groq LLM is not configured.", [], "deepsearch")
+
+    try:
+        # Prepare chat history for context
+        chat_history_messages = []
+        if session_id and session_id in chat_sessions:
+            session_data = chat_sessions[session_id]
+            if session_data.get('messages'):
+                for human_msg, ai_msg in session_data['messages']:
+                    chat_history_messages.extend([
+                        HumanMessage(content=human_msg),
+                        AIMessage(content=ai_msg)
+                    ])
+
+        # Create a prompt that includes chat history
+        prompt_template = """You are a powerful, helpful AI assistant named TotaPakhii. Use the following conversation history to provide a coherent and relevant answer to the user's latest question. If the question is unrelated to the history, answer it directly.
+
+Conversation History:
+{chat_history}
+
+User Question:
+{question}
+
+Your Answer:"""
+        
+        prompt = PromptTemplate(
+            input_variables=["chat_history", "question"],
+            template=prompt_template
+        )
+
+        # Create a chain to process the prompt
+        chain = prompt | llm
+
+        # Invoke the chain with the query and history
+        response = chain.invoke({
+            "question": query,
+            "chat_history": "\n".join([f"{type(msg).__name__}: {msg.content}" for msg in chat_history_messages])
+        })
+        
+        answer = response.content if hasattr(response, 'content') else str(response)
+
+        # DeepSearch has no external sources, so return an empty list
+        return answer, [], "deepsearch"
+
+    except Exception as e:
+        print(f"❌ Error during Deep Search query: {e}")
+        return ("LLM Error: There was an error processing your request with the language model.", [], "deepsearch")
+
 def get_demo_response(query):
     """Provide demo responses when APIs are not configured."""
     demo_responses = {
@@ -365,6 +420,8 @@ def index():
         print(f"Error rendering template: {e}")
         return "<h1>Error</h1><p>Could not find the index.html template. Make sure it's in a 'templates' folder.</p>", 500
 
+
+
 @app.route('/api/chat', methods=['POST'])
 def chat_api():
     """Handle chat messages from the frontend."""
@@ -386,39 +443,46 @@ def chat_api():
                 'context_memory': []
             }
         
-        # --- ENTIRE LOGIC BLOCK MODIFIED ---
+        # --- MODIFIED LOGIC BLOCK TO INCLUDE DEEPSEARCH ---
 
-        # 1. Get raw content, sources, and type from the appropriate function
+        raw_content, sources, result_type = "", [], "demo"
+
         if search_type == 'web':
             if TAVILY_API_KEY:
                 raw_content, sources, result_type = query_web_search(message)
             else:
                 raw_content, sources, result_type = get_demo_response(message)
-        else:
+        
+        # NEW: Handle DeepSearch
+        elif search_type == 'deepsearch':
+            if GROQ_API_KEY:
+                raw_content, sources, result_type = query_deep_search(message, session_id)
+            else:
+                raw_content, sources, result_type = get_demo_response(message)
+        
+        else: # Default to PDF search
             if GROQ_API_KEY and PINECONE_API_KEY:
                 raw_content, sources, result_type = query_pdfs_with_context(message, session_id)
             else:
                 raw_content, sources, result_type = get_demo_response(message)
         
-        # 2. Determine the prefix based on the result type
         prefix = ""
         if result_type == "pdf":
-            # Check if it's a success or an error/fallback message
             if sources:
                  prefix = "📄 From Knowledge Base:"
             else:
-                 prefix = "📄 Knowledge Base:" # A simpler prefix for notifications
+                 prefix = "📄 Knowledge Base:"
         elif result_type == "web":
             prefix = "🌐 Web Search Results:"
+        # NEW: Prefix for DeepSearch
+        elif result_type == "deepsearch":
+            prefix = "🧠 Deep Search Response:"
         elif result_type == "demo":
             prefix = "🤖 Demo Mode:"
 
-        # 3. Combine prefix and content, then clean the Markdown
-        # This is the key fix: .replace('**', '') removes the bolding characters.
         full_response_markdown = f"{prefix}\n\n{raw_content}"
         final_answer = full_response_markdown.replace('**', '')
 
-        # 4. Update session with the cleaned, final answer
         session = chat_sessions[session_id]
         session['messages'].append([message, final_answer])
         
@@ -435,10 +499,9 @@ def chat_api():
             'timestamp': datetime.now().isoformat()
         })
         
-        # 5. Return the cleaned answer in the JSON response
         return jsonify({
             'success': True,
-            'answer': final_answer, # Sending the cleaned answer
+            'answer': final_answer,
             'sources': sources,
             'session_id': session_id,
             'search_type': result_type
