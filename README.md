@@ -148,7 +148,7 @@ git push -u origin main
 
 	
 ## 3. Create ECR repo to store/save docker image
-    - Save the URI: 086387342280.dkr.ecr.ap-south-1.amazonaws.com/totapakhii
+    - Save the URI: 799840519333.dkr.ecr.ap-south-1.amazonaws.com/totapakhiibot
 
 	
 ## 4. Create EC2 machine (Ubuntu) 
