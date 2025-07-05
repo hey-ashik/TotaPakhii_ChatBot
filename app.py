@@ -668,4 +668,4 @@ if __name__ == "__main__":
     print("Press CTRL+C to quit")
     
     # --- CHANGE 2: Run the server on 0.0.0.0 for better accessibility ---
-    app.run(debug=True, host='0.0.0.0', port=7860)
+    app.run(debug=False, host='0.0.0.0', port=7860)
