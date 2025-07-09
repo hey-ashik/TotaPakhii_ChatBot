@@ -197,7 +197,24 @@
             color: #e6edf3;
             margin-bottom: 20px;
         }
-        
+                /* Typing Animation Styles */
+        .welcome-title {
+            /* Ensures the container doesn't collapse when empty */
+            min-height: 1.2em; 
+        }
+
+        .welcome-title .cursor {
+            display: inline-block;
+            background-color: #e6edf3;
+            margin-left: 4px;
+            width: 3px;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
         .welcome-subtitle {
             font-size: 16px;
             color: #7d8590;
@@ -762,7 +779,24 @@
             .welcome-title {
                 font-size: 28px;
             }
-            
+                    /* Typing Animation Styles */
+        .welcome-title {
+            /* Ensures the container doesn't collapse when empty */
+            min-height: 1.2em; 
+        }
+
+        .welcome-title .cursor {
+            display: inline-block;
+            background-color: #e6edf3;
+            margin-left: 4px;
+            width: 3px;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
             .api-status-grid {
                 grid-template-columns: 1fr;
                 gap: 12px;
@@ -802,7 +836,24 @@
             .welcome-title {
                 font-size: 24px;
             }
-            
+                    /* Typing Animation Styles */
+        .welcome-title {
+            /* Ensures the container doesn't collapse when empty */
+            min-height: 1.2em; 
+        }
+
+        .welcome-title .cursor {
+            display: inline-block;
+            background-color: #e6edf3;
+            margin-left: 4px;
+            width: 3px;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
             .welcome-subtitle {
                 font-size: 14px;
             }
@@ -1110,6 +1161,10 @@
                     <span>🧠</span>
                     <span>Deep Search</span>
                 </div>
+                <div class="sidebar-item tool-sidebar-item" onclick="selectToolFromSidebar('ragsearch')" data-tool="ragsearch">
+                    <span>🤖</span>
+                    <span>RAG Search</span>
+                </div>
             </div>
             
             <div class="sidebar-section">
@@ -1135,7 +1190,7 @@
             <!-- Welcome Section -->
             <div class="welcome-section" id="welcomeSection">
                 <h1 class="welcome-title">What can I help with?</h1>
-                <p class="welcome-subtitle">I’m Your AI Assistant, Empowering Business with Real-Time Answers via Knowledge Base - Web Search & Deep Search, Powered by RAG and LLM Technology.</p>
+                <p class="welcome-subtitle">I’m Your AI Assistant, Empowering Business with Real-Time Answers via — RAG Search, Knowledge Base, Web Search & Deep Search, Powered by RAG and LLM Technology.</p>
             </div>
             
             <!-- Messages Container -->
@@ -1171,6 +1226,13 @@
                     <div class="tool-info">
                         <div class="tool-title">Deep Search</div>
                         <div class="tool-description">Directly query the LLM for creative or complex tasks</div>
+                    </div>
+                </div>
+                <div class="tool-option" onclick="selectTool('ragsearch')" data-tool="ragsearch">
+                    <div class="tool-icon">🤖</div>
+                    <div class="tool-info">
+                        <div class="tool-title">RAG Search (Auto)</div>
+                        <div class="tool-description">Let the AI decide whether to use KB, Web, or Deep search</div>
                     </div>
                 </div>
             </div>
@@ -1238,7 +1300,7 @@
             closeSidebar();
         }
         
-        function selectTool(tool) {
+                function selectTool(tool) {
             selectedTool = tool;
             
             // Close the dropdown if open
@@ -1259,12 +1321,19 @@
                     icon = '🧠';
                     title = 'Deep Search';
                     break;
+                // --- ADD THIS CASE ---
+                case 'ragsearch':
+                    icon = '🤖';
+                    title = 'RAG Search';
+                    break;
+                // --- END OF NEW CASE ---
                 case 'knowledgebase':
                 default:
                     // Keep default values
                     break;
             }
             
+            // --- CHANGE THIS LINE to show the title again ---
             toolsButton.innerHTML = `<span>${icon}</span><span></span>`;
             
             // Update tool selection in dropdown
@@ -1568,17 +1637,71 @@ function closeLibraryModal() {
         });
         
         // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
+                document.addEventListener('DOMContentLoaded', function() {
             console.log('ChatBot initialized');
             selectTool('knowledgebase');
             document.getElementById('messageInput').focus();
-            
-            selectTool('knowledgebase');
-            document.getElementById('messageInput').focus();
             loadChatHistory();
+            
+            // Start the typing animation
+            initTypingAnimation(); 
         });
 
         // Chat History Functions
+                   function initTypingAnimation() {
+            // --- Configuration ---
+            const textsToAnimate = [
+                "Welcome to TotaPakhii",
+                "How can I help you today?",
+                "Your Intelligent AI Assistant",
+                 "Ask me anything!"
+            ];
+            const typingSpeed = 50;    // How fast to type
+            const eraseSpeed = 50;     // How fast to erase
+            const pauseBeforeErase = 2000; // Pause after typing (2 seconds)
+            const pauseBeforeTyping = 500; // Pause before typing new text (0.5 seconds)
+
+            // --- State Variables ---
+            const titleElement = document.querySelector('.welcome-title');
+            let textIndex = 0; // Which text from the array we're on
+            let charIndex = 0; // Which character of the current text we're on
+
+            // Ensure the cursor is there from the start
+            titleElement.innerHTML = '<span class="typed-text"></span><span class="cursor"></span>';
+            const typedTextElement = titleElement.querySelector('.typed-text');
+            
+            function type() {
+                // If we are still typing the current text
+                if (charIndex < textsToAnimate[textIndex].length) {
+                    typedTextElement.textContent += textsToAnimate[textIndex].charAt(charIndex);
+                    charIndex++;
+                    setTimeout(type, typingSpeed);
+                } 
+                // Finished typing, so pause and then start erasing
+                else {
+                    setTimeout(erase, pauseBeforeErase);
+                }
+            }
+
+            function erase() {
+                // If we are still erasing the current text
+                if (charIndex > 0) {
+                    typedTextElement.textContent = textsToAnimate[textIndex].substring(0, charIndex - 1);
+                    charIndex--;
+                    setTimeout(erase, eraseSpeed);
+                } 
+                // Finished erasing, so move to the next text and start typing
+                else {
+                    // Use modulo (%) to loop back to the start of the array
+                    textIndex = (textIndex + 1) % textsToAnimate.length;
+                    setTimeout(type, pauseBeforeTyping);
+                }
+            }
+
+            // Start the animation cycle
+            setTimeout(type, 500);
+        }
+          
     function saveChatToHistory(message, response) {
     const chatHistory = JSON.parse(localStorage.getItem('chatHistory') || '[]');
     const chatId = Date.now().toString();
